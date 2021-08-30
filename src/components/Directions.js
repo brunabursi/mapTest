@@ -11,7 +11,7 @@ const Directions = ({ destination, origin, onReady }) => {
       onReady={onReady}
       mode="DRIVING"
       timePrecision="now"
-      apikey="AIzaSyAts8oN0ApQZQljA_0dAC0VML_5JQhWGwo"
+      apikey="API_KEY"
       strokeColor="hotpink"
       strokeWidth={3}
     />
