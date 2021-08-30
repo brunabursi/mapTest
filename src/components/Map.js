@@ -5,7 +5,7 @@ import Geolocation from 'react-native-geolocation-service'
 import Geocoder from "react-native-geocoding"
 import Search from './Search'
 import Directions from './Directions'
-import Ride from './Ride'
+// import Ride from './Ride'
 import {
   Back,
   LocationBox,
@@ -45,6 +45,7 @@ const Map = () => {
           const { latitude, longitude } = position.coords
           setRegion({ ...region, latitude, longitude })
 
+          // Geocoder é necessário? Backend pode me enviar as informações de endereço minimizado para renderizar na tela
           const response = await Geocoder.from({ latitude, longitude })
           const address = response.results[0].formatted_address
           setLocation(address.substring(0, address.indexOf(',')))
@@ -59,20 +60,20 @@ const Map = () => {
     }
   }, [])
 
-  // useEffect(() => {
-  //   if (mapViewRef.current && destination) {
-  //     mapViewRef.current.animateCamera(
-  //       {
-  //         center: {
-  //           latitude: destination.latitude,
-  //           longitude: destination.longitude
-  //         },
-  //         zoom: 15
-  //       },
-  //       5000
-  //     );
-  //   }
-  // }, [mapViewRef, destination]);
+  useEffect(() => {
+    if (mapViewRef.current && destination) {
+      mapViewRef.current.animateCamera(
+        {
+          center: {
+            latitude: region.latitude,
+            longitude: region.longitude
+          },
+          zoom: 15
+        },
+        5000
+      );
+    }
+  }, [mapViewRef]);
 
   // Set location como o nome da rua e destination como lat, long e title quando o usuário clica em uma opção da lista
   const handleLocationSelected = (data, { geometry }) => {
@@ -87,15 +88,15 @@ const Map = () => {
   const onReady = result => {
     setDuration(Math.floor(result.duration))
     // func que faz o mapa dar zoom out quando encontra a rota e por algum motivo não funciona com o setState junto TODO
-    mapViewRef.current.fitToCoordinates(result.coordinates, {
-      edgePadding: {
-        right: (width / 10),
-        bottom: (height / 10),
-        left: (width / 10),
-        top: (height / 10),
-      },
-      animated: true
-    })
+    // mapViewRef.current.fitToCoordinates([result.coordinates[0], result.coordinates[(result.coordinates).length]], {
+    //   edgePadding: {
+    //     right: (width / 10),
+    //     bottom: (height / 10),
+    //     left: (width / 10),
+    //     top: (height / 10),
+    //   },
+    //   animated: true
+    // })
   }
 
   // Quando o usuário faz a ação de voltar, apaga o destination
@@ -108,12 +109,10 @@ const Map = () => {
         <MapView
           style={{ flex: 1 }}
           region={region}
-          onRegionChangeComplete={region => {
-            console.log(region)
-            // setRegion(region)
-          }}
-          showsUserLocation
+          showsUserLocation={true}
+          // onUserLocationChange={() => }
           loadingEnabled
+          followsUserLocation
           ref={mapViewRef}
         >
           <Marker

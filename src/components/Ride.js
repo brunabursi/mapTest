@@ -1,46 +1,57 @@
-import React from 'react'
-import MapboxNavigation from '@homee/react-native-mapbox-navigation'
-import { View } from 'react-native'
+import React, { useState, useEffect } from 'react';
+import Styled from 'styled-components/native';
+import Geolocation from 'react-native-geolocation-service';
 
-const Ride = ({ destination, origin }) => {
-  let rideDestination = Object.values(destination).slice(0, 2)
-  let rideOrigin = Object.values(origin).slice(0, 2)
-  console.log('ta chamando esse troço')
-  return (
-    <View style={{
-      container: {
-        flex: 1,
+const Container = Styled.View`
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+`;
+
+const Label = Styled.Text`
+    font-size: 24px;
+`;
+
+// keep track of user location
+const WatchLocation = () => {
+  const [location, setLocation] = useState(undefined);
+
+  useEffect(() => {
+    const _watchId = Geolocation.watchPosition(
+      position => {
+        const { latitude, longitude } = position.coords;
+        setLocation({ latitude, longitude });
       },
-    }}>
-      <MapboxNavigation
-        destination={rideDestination}
-        origin={rideOrigin}
-        shouldSimulateRoute={true}
-        onLocationChange={(event) => {
-          const { latitude, longitude } = event.nativeEvent;
-        }}
-        onRouteProgressChange={(event) => {
-          const {
-            distanceTraveled,
-            durationRemaining,
-            fractionTraveled,
-            distanceRemaining,
-          } = event.nativeEvent;
-        }}
-        onError={(event) => {
-          const { message } = event.nativeEvent;
-        }}
-        onCancelNavigation={() => {
-          // User tapped the "X" cancel button in the nav UI
-          // or canceled via the OS system tray on android.
-          // Do whatever you need to here.
-        }}
-        onArrive={() => {
-          // Called when you arrive at the destination.
-        }}
-      />
-    </View>
-  )
-}
+      error => {
+        console.log(error);
+      },
+      {
+        enableHighAccuracy: true,
+        distanceFilter: 0,
+        interval: 5000,
+        fastestInterval: 2000,
+      },
+    );
 
-export default Ride
+    return () => {
+      if (_watchId) {
+        Geolocation.clearWatch(_watchId);
+      }
+    };
+  }, []);
+
+  return (
+    <Container>
+      {location ? (
+        <>
+          <Label>Latitude: {location.latitude}</Label>
+          <Label>Latitude: {location.longitude}</Label>
+        </>
+      ) : (
+        <Label>Loading...</Label>
+      )}
+    </Container>
+  );
+};
+
+export default WatchLocation;

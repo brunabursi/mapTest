@@ -1,6 +1,8 @@
 import React from 'react'
 import MapViewDirections from 'react-native-maps-directions'
 
+// Como pintar o caminho sem usar essa lib que faz uma chamada no google? TODO
+
 const Directions = ({ destination, origin, onReady }) => {
   return (
     <MapViewDirections
